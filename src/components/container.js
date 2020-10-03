@@ -22,7 +22,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import memoize from 'lodash.memoize';
 import {console as Console} from 'global/window';
-import {injector, typeCheckRecipe} from './injector';
+import {injector, provideRecipesToInjector, flattenDeps} from './injector';
 import KeplerGlFactory from './kepler-gl';
 import {forwardTo} from 'actions/action-wrapper';
 
@@ -153,14 +153,6 @@ export function ContainerFactory(KeplerGl) {
   const mapStateToProps = (state, props) => ({state, ...props});
   const dispatchToProps = dispatch => ({dispatch});
   return connect(mapStateToProps, dispatchToProps)(Container);
-}
-
-// entryPoint
-function flattenDeps(allDeps, factory) {
-  const addToDeps = allDeps.concat([factory]);
-  return Array.isArray(factory.deps) && factory.deps.length
-    ? factory.deps.reduce((accu, dep) => flattenDeps(accu, dep), addToDeps)
-    : addToDeps;
 }
 
 const allDependencies = flattenDeps([], ContainerFactory);
