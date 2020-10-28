@@ -165,33 +165,7 @@ export const appInjector = allDependencies.reduce(
 
 // Helper to inject custom components and return kepler.gl container
 export function injectComponents(recipes = []) {
-  const provided = new Map();
-
-  return recipes
-    .reduce((inj, recipe) => {
-      if (!typeCheckRecipe(recipe)) {
-        return inj;
-      }
-
-      // collect dependencies of custom factories, if there is any.
-      // Add them to the injector
-      const customDependencies = flattenDeps([], recipe[1]);
-      inj = customDependencies.reduce((ij, factory) => {
-        if (provided.get(factory)) {
-          console.warn(
-            `${factory.name} already injected from ${provided.get(factory).name}, injecting ${
-              recipe[0].name
-            } after ${provided.get(factory).name} will override it`
-          );
-        }
-        return ij.provide(factory, factory);
-      }, inj);
-      provided.set(recipe[0], recipe[1]);
-
-
-      return inj.provide(...recipe);
-    }, appInjector)
-    .get(ContainerFactory);
+  provideRecipesToInjector(recipes, appInjector).get(ContainerFactory);
 }
 
 const InjectedContainer = appInjector.get(ContainerFactory);
